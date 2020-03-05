@@ -35,19 +35,21 @@ class Blockchain {
 
     static isValidChain(chain) {
         if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis())) {
-            return false;
+            return false
         };
 
         for (let counter=1; counter<chain.length; counter++) {
-            const {timestamp, lastHash, hash, data} = chain[counter];
-
+            const {timestamp, lastHash, hash, nonce, difficulty, data} = chain[counter];
             const trueLastHash = chain[counter-1].hash;
+            const lastDifficulty = chain[counter-1].difficulty;
 
             if (lastHash !== trueLastHash) return false;
 
-            const validatedHash = cryptoHash (timestamp, lastHash, data);
+            const validatedHash = cryptoHash (timestamp, lastHash, data, nonce, difficulty);
 
             if (hash !== validatedHash) return false
+
+            if (Math.abs(lastDifficulty - difficulty) > 1) return false;
         }
 
         return true;
